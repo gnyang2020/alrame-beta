@@ -646,22 +646,21 @@ async function processPsdTopOfGroup(psd, radius, color, onProgress) {
   const folders = (psd.children || []).filter(c => c.children && c.children.length > 0);
   const previews = [];
 
-  if (folders.length === 0) {
-    /* 폴더 없는 PSD (카카오): 맨 위 레이어에 테두리 → 전체 병합 → PNG 1장 */
+  if (folders.length <= 1) {
+    /* PSD 전체가 시안 1개 (폴더 0~1개): 맨 위 리프 레이어에 테두리 → 전체 병합 */
     const leafLayers = collectLeafLayers(psd);
     if (leafLayers.length > 0) {
-      /* 맨 위(마지막) 리프 레이어에 테두리 */
       const topLayer = leafLayers[leafLayers.length - 1];
       if (topLayer.canvas && !isCanvasEmpty(topLayer.canvas)) {
         await addBorderPsd(topLayer, radius, color, psdW, psdH);
       }
-      /* folder 키 대신 psd 자체를 folder로 전달 (병합은 run()에서 수행) */
       previews.push({ folder: psd, name: psd.name || 'merged', outlined: true, psdW, psdH });
       onProgress(1);
     }
     return previews;
   }
 
+  /* 폴더 2개 이상: 폴더별 처리 (폴더 1개 = 시안 1개) */
   for (let fi = 0; fi < folders.length; fi++) {
     const folder = folders[fi];
     const lastIdx = folder.children.length - 1;
@@ -797,10 +796,10 @@ function mergeFolderToCanvas(folder, psdW, psdH) {
 async function processPsdAllLayers(psd, radius, color, onProgress) {
   const psdW = psd.width, psdH = psd.height;
   const previews = [];
-  const hasGroups = psd.children && psd.children.some(c => c.children && c.children.length > 0);
+  const folders = (psd.children || []).filter(c => c.children && c.children.length > 0);
 
-  if (hasGroups) {
-    const folders = psd.children.filter(c => c.children && c.children.length > 0);
+  if (folders.length >= 2) {
+    /* 폴더 2개 이상: 폴더별 처리 (폴더 1개 = 시안 1개) */
     for (let fi = 0; fi < folders.length; fi++) {
       const folder = folders[fi];
       const leafLayers = collectLeafLayers(folder);
@@ -826,13 +825,12 @@ async function processPsdAllLayers(psd, radius, color, onProgress) {
       onProgress((fi + 1) / folders.length);
     }
   } else {
-    /* 폴더 없는 PSD: 모든 레이어를 하나로 병합 후 테두리 */
+    /* PSD 전체가 시안 1개 (폴더 0~1개): 전체 병합 → 테두리 */
     const leafLayers = collectLeafLayers(psd);
     if (leafLayers.length > 0) {
       const merged = compositeLayersToCanvas(leafLayers, psdW, psdH);
       const mergedLayer = { canvas: merged, left: 0, top: 0, right: psdW, bottom: psdH, name: 'merged' };
       await addBorderPsd(mergedLayer, radius, color, psdW, psdH);
-      /* PSD 출력용: 테두리 레이어를 최하위에 추가 */
       const borderLayer = {
         name: 'outline',
         canvas: mergedLayer.canvas,
@@ -973,12 +971,18 @@ async function run() {
 
           if (kakaoOutput === 'png') {
             const psdBaseName = file.name.replace(/\.psd$/i, '');
+            const singleResult = (mergedCanvases.length === 1);
             for (let pi = 0; pi < mergedCanvases.length; pi++) {
               const pngBlob = await canvasToBlob(mergedCanvases[pi].canvas);
               const num = String(pi + 1).padStart(2, '0');
-              const pngName = (files.length > 1)
-                ? psdBaseName + '/' + mergedCanvases[pi].name + '_' + num + '.png'
-                : mergedCanvases[pi].name + '_' + num + '.png';
+              let pngName;
+              if (singleResult) {
+                pngName = psdBaseName + '.png';
+              } else if (files.length > 1) {
+                pngName = psdBaseName + '/' + mergedCanvases[pi].name + '_' + num + '.png';
+              } else {
+                pngName = mergedCanvases[pi].name + '_' + num + '.png';
+              }
               resultBlobs.push({ name: pngName, blob: pngBlob });
             }
             setStatus('완성! ' + mergedCanvases.length + '장 PNG 변환 완료');
@@ -1060,21 +1064,33 @@ async function run() {
               cropCtx.drawImage(sq, Math.round((740 - 640) / 2), 0);
               const pngBlob = await canvasToBlob(cropped);
               const num = String(pi + 1).padStart(2, '0');
-              const pngName = (files.length > 1)
-                ? psdBaseName + '/' + naverPreviews[pi].name + '_' + num + '.png'
-                : naverPreviews[pi].name + '_' + num + '.png';
+              const singleResult740 = (naverPreviews.length === 1);
+              let pngName;
+              if (singleResult740) {
+                pngName = psdBaseName + '.png';
+              } else if (files.length > 1) {
+                pngName = psdBaseName + '/' + naverPreviews[pi].name + '_' + num + '.png';
+              } else {
+                pngName = naverPreviews[pi].name + '_' + num + '.png';
+              }
               resultBlobs.push({ name: pngName, blob: pngBlob });
             }
             setStatus('완성! ' + naverPreviews.length + '장 740×640 PNG 변환 완료');
 
           } else if (naverOutput === 'png') {
             const psdBaseName = file.name.replace(/\.psd$/i, '');
+            const singleResultPng = (naverPreviews.length === 1);
             for (let pi = 0; pi < naverPreviews.length; pi++) {
               const pngBlob = await canvasToBlob(naverPreviews[pi].canvas);
               const num = String(pi + 1).padStart(2, '0');
-              const pngName = (files.length > 1)
-                ? psdBaseName + '/' + naverPreviews[pi].name + '_' + num + '.png'
-                : naverPreviews[pi].name + '_' + num + '.png';
+              let pngName;
+              if (singleResultPng) {
+                pngName = psdBaseName + '.png';
+              } else if (files.length > 1) {
+                pngName = psdBaseName + '/' + naverPreviews[pi].name + '_' + num + '.png';
+              } else {
+                pngName = naverPreviews[pi].name + '_' + num + '.png';
+              }
               resultBlobs.push({ name: pngName, blob: pngBlob });
             }
             setStatus('완성! ' + naverPreviews.length + '장 PNG 변환 완료');
