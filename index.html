@@ -645,6 +645,23 @@ async function processPsdTopOfGroup(psd, radius, color, onProgress) {
   const psdW = psd.width, psdH = psd.height;
   const folders = (psd.children || []).filter(c => c.children && c.children.length > 0);
   const previews = [];
+
+  if (folders.length === 0) {
+    /* 폴더 없는 PSD (카카오): 맨 위 레이어에 테두리 → 전체 병합 → PNG 1장 */
+    const leafLayers = collectLeafLayers(psd);
+    if (leafLayers.length > 0) {
+      /* 맨 위(마지막) 리프 레이어에 테두리 */
+      const topLayer = leafLayers[leafLayers.length - 1];
+      if (topLayer.canvas && !isCanvasEmpty(topLayer.canvas)) {
+        await addBorderPsd(topLayer, radius, color, psdW, psdH);
+      }
+      /* folder 키 대신 psd 자체를 folder로 전달 (병합은 run()에서 수행) */
+      previews.push({ folder: psd, name: psd.name || 'merged', outlined: true, psdW, psdH });
+      onProgress(1);
+    }
+    return previews;
+  }
+
   for (let fi = 0; fi < folders.length; fi++) {
     const folder = folders[fi];
     const lastIdx = folder.children.length - 1;
@@ -809,20 +826,26 @@ async function processPsdAllLayers(psd, radius, color, onProgress) {
       onProgress((fi + 1) / folders.length);
     }
   } else {
-    const layers = [];
-    function collect(node) {
-      if (node.canvas) layers.push(node);
-      if (node.children) node.children.forEach(collect);
-    }
-    if (psd.children) psd.children.forEach(collect);
-    for (let i = 0; i < layers.length; i++) {
-      await addBorderPsd(layers[i], radius, color, psdW, psdH);
+    /* 폴더 없는 PSD: 모든 레이어를 하나로 병합 후 테두리 */
+    const leafLayers = collectLeafLayers(psd);
+    if (leafLayers.length > 0) {
+      const merged = compositeLayersToCanvas(leafLayers, psdW, psdH);
+      const mergedLayer = { canvas: merged, left: 0, top: 0, right: psdW, bottom: psdH, name: 'merged' };
+      await addBorderPsd(mergedLayer, radius, color, psdW, psdH);
+      /* PSD 출력용: 테두리 레이어를 최하위에 추가 */
+      const borderLayer = {
+        name: 'outline',
+        canvas: mergedLayer.canvas,
+        left: mergedLayer.left, top: mergedLayer.top,
+        right: mergedLayer.right, bottom: mergedLayer.bottom
+      };
+      psd.children.unshift(borderLayer);
       previews.push({
-        canvas: layers[i].canvas, name: layers[i].name,
-        left: layers[i].left || 0, top: layers[i].top || 0,
+        canvas: mergedLayer.canvas, name: 'merged',
+        left: mergedLayer.left || 0, top: mergedLayer.top || 0,
         psdW: psdW, psdH: psdH
       });
-      onProgress((i + 1) / layers.length);
+      onProgress(1);
     }
   }
   return previews;
