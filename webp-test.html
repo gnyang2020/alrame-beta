@@ -1,0 +1,772 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WebP 애니메이션 테스트</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif; background: #1a1a2e; color: #eee; min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding: 20px; }
+h1 { font-size: 22px; margin-bottom: 6px; }
+.subtitle { font-size: 13px; color: #aaa; margin-bottom: 20px; }
+.container { background: #16213e; border-radius: 16px; padding: 24px; width: 100%; max-width: 540px; }
+.section-title { font-size: 14px; font-weight: 700; margin-bottom: 10px; color: #7fdbca; }
+
+.lib-status { font-size: 11px; padding: 6px 10px; border-radius: 6px; margin-bottom: 12px; }
+.lib-ok { background: rgba(78,205,196,0.15); color: #4ecdc4; }
+.lib-err { background: rgba(255,100,100,0.15); color: #ff6464; }
+.lib-loading { background: rgba(240,173,78,0.15); color: #f0ad4e; }
+
+/* 입력 모드 탭 */
+.input-tabs { display: flex; gap: 6px; margin-bottom: 12px; }
+.input-tab { flex: 1; padding: 10px; border: 2px solid #4a5568; border-radius: 10px; background: transparent; color: #aaa; font-size: 13px; font-weight: 700; cursor: pointer; text-align: center; transition: all 0.2s; }
+.input-tab.active { border-color: #4ecdc4; color: #4ecdc4; background: rgba(78,205,196,0.08); }
+
+/* 드롭존 */
+.dropzone { border: 2px dashed #4a5568; border-radius: 12px; padding: 30px; text-align: center; cursor: pointer; transition: all 0.2s; margin-bottom: 16px; }
+.dropzone:hover, .dropzone.dragover { border-color: #7fdbca; background: rgba(127,219,202,0.05); }
+.dropzone p { font-size: 14px; color: #aaa; }
+.dropzone .icon { font-size: 32px; margin-bottom: 8px; }
+
+/* 설정 */
+.setting-row { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; flex-wrap: wrap; }
+.setting-label { font-size: 13px; font-weight: 600; min-width: 55px; }
+input[type="number"] { width: 70px; padding: 6px 8px; border-radius: 8px; border: 1px solid #4a5568; background: #0f3460; color: #fff; font-size: 14px; text-align: center; }
+input[type="color"] { width: 36px; height: 36px; border: none; border-radius: 8px; cursor: pointer; background: transparent; }
+.unit { font-size: 12px; color: #aaa; }
+
+/* 아웃라인 토글 */
+.outline-toggle { display: flex; align-items: center; gap: 8px; }
+.toggle-switch { position: relative; width: 40px; height: 22px; cursor: pointer; }
+.toggle-switch input { display: none; }
+.toggle-slider { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: #4a5568; border-radius: 11px; transition: 0.2s; }
+.toggle-slider::before { content: ''; position: absolute; width: 18px; height: 18px; left: 2px; top: 2px; background: #fff; border-radius: 50%; transition: 0.2s; }
+.toggle-switch input:checked + .toggle-slider { background: #4ecdc4; }
+.toggle-switch input:checked + .toggle-slider::before { transform: translateX(18px); }
+.toggle-label { font-size: 12px; color: #aaa; }
+.outline-controls { display: flex; align-items: center; gap: 10px; transition: opacity 0.2s; }
+.outline-controls.disabled { opacity: 0.3; pointer-events: none; }
+
+/* 프레임 리스트 */
+.frame-list { margin: 12px 0; max-height: 320px; overflow-y: auto; }
+.frame-item { display: flex; align-items: center; gap: 8px; padding: 8px; background: #0f3460; border-radius: 8px; margin-bottom: 6px; }
+.frame-item canvas { border-radius: 4px; background: repeating-conic-gradient(#2a2a4a 0% 25%, #1a1a2e 0% 50%) 50%/16px 16px; }
+.frame-item .frame-num { font-size: 12px; font-weight: 700; color: #7fdbca; min-width: 28px; }
+.frame-item input[type="number"] { width: 62px; }
+.frame-item .frame-name { flex: 1; font-size: 11px; color: #ccc; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.frame-item .remove-btn { background: none; border: none; color: #ff6464; cursor: pointer; font-size: 16px; padding: 2px 6px; border-radius: 4px; }
+.frame-item .remove-btn:hover { background: rgba(255,100,100,0.15); }
+
+/* 버튼 */
+.btn { padding: 12px 24px; border: none; border-radius: 10px; font-size: 15px; font-weight: 700; cursor: pointer; transition: all 0.2s; width: 100%; }
+.btn-primary { background: linear-gradient(135deg, #7fdbca, #4ecdc4); color: #1a1a2e; }
+.btn-primary:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(78,205,196,0.3); }
+.btn-primary:disabled { opacity: 0.4; cursor: not-allowed; transform: none; box-shadow: none; }
+.btn-secondary { background: #0f3460; color: #7fdbca; border: 1px solid #4a5568; margin-top: 8px; }
+
+/* 결과 */
+.result-area { margin-top: 16px; text-align: center; display: none; }
+.result-area img { max-width: 100%; max-height: 300px; border-radius: 8px; background: repeating-conic-gradient(#2a2a4a 0% 25%, #1a1a2e 0% 50%) 50%/16px 16px; }
+.result-info { font-size: 12px; color: #aaa; margin-top: 8px; }
+.progress-bar { width: 100%; height: 6px; background: #0f3460; border-radius: 3px; margin: 12px 0; overflow: hidden; display: none; }
+.progress-fill { height: 100%; background: linear-gradient(90deg, #7fdbca, #4ecdc4); width: 0%; transition: width 0.3s; border-radius: 3px; }
+
+.notice { font-size: 11px; color: #f0ad4e; background: rgba(240,173,78,0.1); border-radius: 8px; padding: 10px 12px; margin-bottom: 16px; line-height: 1.6; }
+.hidden { display: none !important; }
+</style>
+</head>
+<body>
+
+<h1>WebP 애니메이션 테스트</h1>
+<p class="subtitle">PSD/PNG → 텍스트 아웃라인 → 애니메이션 WebP</p>
+
+<div class="container">
+  <div class="lib-status lib-loading" id="libStatus">⏳ ag-psd 라이브러리 로딩 중...</div>
+
+  <!-- 입력 모드 선택 -->
+  <div class="section-title">1. 파일 업로드</div>
+  <div class="input-tabs">
+    <button class="input-tab active" id="tabPsd" onclick="switchTab('psd')">📄 PSD 파일</button>
+    <button class="input-tab" id="tabPng" onclick="switchTab('png')">🖼️ PNG 이미지</button>
+  </div>
+
+  <div class="notice" id="noticePsd">
+    📁 PSD 폴더별 최상위 레이어(텍스트)에만 아웃라인을 적용합니다.<br>
+    🧩 최상위 레이어가 비어있으면 아웃라인 없이 합성됩니다.<br>
+    ⚠️ 카카오 이모티콘 PSD와 동일한 구조로 작동합니다.
+  </div>
+  <div class="notice hidden" id="noticePng">
+    🖼️ PNG/WEBP 이미지 여러 장 = 각각 하나의 프레임<br>
+    ✨ 전체 이미지에 아웃라인이 적용됩니다.
+  </div>
+
+  <div class="dropzone" id="fileDrop">
+    <div class="icon">📂</div>
+    <p id="dropText">PSD 파일을 드래그하거나 클릭</p>
+  </div>
+  <input type="file" id="psdInput" accept=".psd" style="display:none">
+  <input type="file" id="pngInput" accept="image/png,image/webp,image/jpeg" multiple style="display:none">
+
+  <!-- 아웃라인 설정 -->
+  <div class="section-title">2. 아웃라인 설정</div>
+  <div class="setting-row">
+    <div class="outline-toggle">
+      <label class="toggle-switch">
+        <input type="checkbox" id="outlineToggle" checked>
+        <span class="toggle-slider"></span>
+      </label>
+      <span class="toggle-label" id="outlineToggleLabel">아웃라인 ON</span>
+    </div>
+    <div class="outline-controls" id="outlineControls">
+      <span class="setting-label" style="min-width:auto;">두께</span>
+      <input type="number" id="borderSize" value="8" min="1" max="100">
+      <span class="unit">px</span>
+      <div style="display:flex;flex-direction:column;align-items:center;gap:2px;margin-left:8px;">
+        <span class="setting-label" style="min-width:auto;">색상</span>
+        <input type="color" id="borderColor" value="#FFFFFF">
+        <span style="font-size:10px;color:#888;">기본: 흰색</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 프레임 속도 -->
+  <div class="section-title">3. 프레임 속도</div>
+  <div class="setting-row">
+    <span class="setting-label">전체</span>
+    <input type="number" id="globalDelay" value="0.1" min="0.01" max="10" step="0.01">
+    <span class="unit">초</span>
+    <button class="btn btn-secondary" style="width:auto;padding:6px 12px;font-size:12px;margin:0;" onclick="applyGlobalDelay()">일괄 적용</button>
+  </div>
+
+  <div class="frame-list" id="frameList"></div>
+
+  <div class="progress-bar" id="progressBar">
+    <div class="progress-fill" id="progressFill"></div>
+  </div>
+
+  <button class="btn btn-primary" id="runBtn" disabled onclick="generateWebP()">WebP 애니메이션 생성</button>
+
+  <div class="result-area" id="resultArea">
+    <div class="section-title">결과 미리보기</div>
+    <img id="resultImg">
+    <div class="result-info" id="resultInfo"></div>
+    <button class="btn btn-secondary" id="downloadBtn" onclick="downloadResult()">💾 다운로드</button>
+  </div>
+</div>
+
+<!-- ag-psd 라이브러리 -->
+<script src="https://cdn.jsdelivr.net/npm/ag-psd/dist/bundle.js"></script>
+
+<script>
+let frames = []; // [{canvas, name}]
+let resultBlob = null;
+let inputMode = 'psd'; // 'psd' or 'png'
+
+// ── 라이브러리 체크 ──
+window.addEventListener('load', () => {
+  const status = document.getElementById('libStatus');
+  if (typeof agPsd !== 'undefined' && agPsd.readPsd) {
+    status.className = 'lib-status lib-ok';
+    status.textContent = '✅ ag-psd 로딩 완료';
+    setTimeout(() => status.style.display = 'none', 2000);
+  } else {
+    status.className = 'lib-status lib-err';
+    status.textContent = '❌ ag-psd 로딩 실패 — PSD 모드 사용 불가 (PNG 모드는 가능)';
+  }
+});
+
+// ── 입력 모드 전환 ──
+function switchTab(mode) {
+  inputMode = mode;
+  document.getElementById('tabPsd').classList.toggle('active', mode === 'psd');
+  document.getElementById('tabPng').classList.toggle('active', mode === 'png');
+  document.getElementById('noticePsd').classList.toggle('hidden', mode !== 'psd');
+  document.getElementById('noticePng').classList.toggle('hidden', mode !== 'png');
+  document.getElementById('dropText').textContent = mode === 'psd'
+    ? 'PSD 파일을 드래그하거나 클릭'
+    : 'PNG/WEBP 이미지를 드래그하거나 클릭 (여러 장)';
+  // 프레임 초기화
+  frames = [];
+  renderFrameList();
+  document.getElementById('runBtn').disabled = true;
+  document.getElementById('fileDrop').innerHTML = `<div class="icon">${mode === 'psd' ? '📄' : '🖼️'}</div><p id="dropText">${document.getElementById('dropText')?.textContent || ''}</p>`;
+  const dropText = mode === 'psd'
+    ? 'PSD 파일을 드래그하거나 클릭'
+    : 'PNG/WEBP 이미지를 드래그하거나 클릭 (여러 장)';
+  document.getElementById('fileDrop').innerHTML = `<div class="icon">${mode === 'psd' ? '📄' : '🖼️'}</div><p>${dropText}</p>`;
+}
+
+// ── 아웃라인 토글 ──
+document.getElementById('outlineToggle').addEventListener('change', function() {
+  document.getElementById('outlineControls').classList.toggle('disabled', !this.checked);
+  document.getElementById('outlineToggleLabel').textContent = this.checked ? '아웃라인 ON' : '아웃라인 OFF';
+});
+
+// ── 드롭존 이벤트 ──
+const fileDrop = document.getElementById('fileDrop');
+const psdInput = document.getElementById('psdInput');
+const pngInput = document.getElementById('pngInput');
+
+fileDrop.addEventListener('click', () => {
+  if (inputMode === 'psd') psdInput.click();
+  else pngInput.click();
+});
+fileDrop.addEventListener('dragover', e => { e.preventDefault(); fileDrop.classList.add('dragover'); });
+fileDrop.addEventListener('dragleave', () => fileDrop.classList.remove('dragover'));
+fileDrop.addEventListener('drop', e => {
+  e.preventDefault();
+  fileDrop.classList.remove('dragover');
+  if (inputMode === 'psd') {
+    const file = e.dataTransfer.files[0];
+    if (file && file.name.toLowerCase().endsWith('.psd')) loadPSD(file);
+  } else {
+    handlePngFiles(e.dataTransfer.files);
+  }
+});
+psdInput.addEventListener('change', e => { if (e.target.files[0]) loadPSD(e.target.files[0]); });
+pngInput.addEventListener('change', e => { handlePngFiles(e.target.files); pngInput.value = ''; });
+
+// ── 이미지 로드 헬퍼 ──
+function loadImage(src) {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.onload = () => resolve(img);
+    img.onerror = reject;
+    img.src = src;
+  });
+}
+
+// ══════════════════════════════════════
+// PSD 모드: 카카오 방식 텍스트 아웃라인
+// ══════════════════════════════════════
+
+async function loadPSD(file) {
+  if (typeof agPsd === 'undefined') {
+    fileDrop.innerHTML = '<div class="icon">❌</div><p>ag-psd 라이브러리가 로딩되지 않았습니다.</p>';
+    return;
+  }
+
+  fileDrop.innerHTML = '<div class="icon">⏳</div><p>PSD 파싱 중...</p>';
+  frames = [];
+
+  try {
+    const buffer = await file.arrayBuffer();
+    const psd = agPsd.readPsd(buffer, { skipThumbnail: true });
+    const children = psd.children || [];
+    const psdW = psd.width, psdH = psd.height;
+
+    for (let i = 0; i < children.length; i++) {
+      const group = children[i];
+      if (group.hidden) continue;
+
+      // 폴더(그룹)인 경우: 카카오 방식 처리
+      if (group.children && group.children.length > 0) {
+        const frame = processPsdGroup(group, psdW, psdH);
+        if (frame) {
+          frames.push({ canvas: frame, name: group.name || ('프레임 ' + (i + 1)) });
+        }
+      }
+      // 단일 레이어인 경우
+      else if (group.canvas) {
+        const c = document.createElement('canvas');
+        c.width = psdW; c.height = psdH;
+        c.getContext('2d').drawImage(group.canvas, group.left || 0, group.top || 0);
+        if (hasVisiblePixels(c)) {
+          frames.push({ canvas: c, name: group.name || ('프레임 ' + (i + 1)) });
+        }
+      }
+    }
+
+    if (frames.length === 0) {
+      fileDrop.innerHTML = '<div class="icon">⚠️</div><p>프레임을 찾을 수 없습니다</p>';
+      return;
+    }
+
+    fileDrop.innerHTML = `<div class="icon">✅</div><p>${file.name} — ${frames.length}프레임 추출 완료</p>`;
+    renderFrameList();
+    document.getElementById('runBtn').disabled = false;
+  } catch (err) {
+    console.error('PSD 파싱 오류:', err);
+    fileDrop.innerHTML = `<div class="icon">❌</div><p>PSD 오류: ${err.message}</p>`;
+  }
+}
+
+// PSD 폴더 → 텍스트 레이어 아웃라인 + 나머지 합성
+function processPsdGroup(group, psdW, psdH) {
+  const layers = group.children || [];
+  if (layers.length === 0) return null;
+
+  const useOutline = document.getElementById('outlineToggle').checked;
+  const borderSize = parseInt(document.getElementById('borderSize').value) || 8;
+  const borderColor = document.getElementById('borderColor').value;
+
+  // 최상위 레이어 = 텍스트 (index가 가장 큰 것 = 가장 위)
+  const topLayer = layers[layers.length - 1];
+
+  // 최상위 레이어가 비어있는지 확인
+  let topCanvas = null;
+  if (topLayer.canvas) {
+    const tc = document.createElement('canvas');
+    tc.width = psdW; tc.height = psdH;
+    tc.getContext('2d').drawImage(topLayer.canvas, topLayer.left || 0, topLayer.top || 0);
+    if (hasVisiblePixels(tc)) {
+      topCanvas = tc;
+    }
+  }
+
+  // 나머지 레이어 합성 (아래부터 위로, 최상위 제외)
+  const baseCanvas = document.createElement('canvas');
+  baseCanvas.width = psdW; baseCanvas.height = psdH;
+  const baseCtx = baseCanvas.getContext('2d');
+
+  for (let i = 0; i < layers.length - 1; i++) {
+    const layer = layers[i];
+    if (layer.hidden) continue;
+    if (layer.canvas) {
+      baseCtx.drawImage(layer.canvas, layer.left || 0, layer.top || 0);
+    } else if (layer.children) {
+      const sub = renderSubGroup(layer, psdW, psdH);
+      if (sub) baseCtx.drawImage(sub, 0, 0);
+    }
+  }
+
+  // 최종 합성
+  const result = document.createElement('canvas');
+  result.width = psdW; result.height = psdH;
+  const rCtx = result.getContext('2d');
+
+  // 1) 베이스 레이어들
+  rCtx.drawImage(baseCanvas, 0, 0);
+
+  // 2) 텍스트 레이어 (아웃라인 적용 또는 그냥)
+  if (topCanvas) {
+    if (useOutline) {
+      const outlined = addBorderToCanvas(topCanvas, borderSize, borderColor);
+      // 아웃라인은 pad만큼 확장되므로 offset 조정
+      rCtx.drawImage(outlined, -borderSize, -borderSize);
+    } else {
+      rCtx.drawImage(topCanvas, 0, 0);
+    }
+  }
+
+  return hasVisiblePixels(result) ? result : null;
+}
+
+function renderSubGroup(layer, psdW, psdH) {
+  if (!layer.children) return null;
+  const c = document.createElement('canvas');
+  c.width = psdW; c.height = psdH;
+  const ctx = c.getContext('2d');
+  for (const child of layer.children) {
+    if (child.hidden) continue;
+    if (child.canvas) {
+      ctx.drawImage(child.canvas, child.left || 0, child.top || 0);
+    } else if (child.children) {
+      const sub = renderSubGroup(child, psdW, psdH);
+      if (sub) ctx.drawImage(sub, 0, 0);
+    }
+  }
+  return c;
+}
+
+// ══════════════════════════
+// PNG 모드
+// ══════════════════════════
+
+async function handlePngFiles(fileList) {
+  const validFiles = Array.from(fileList)
+    .filter(f => f.type.startsWith('image/'))
+    .sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true }));
+
+  if (validFiles.length === 0) return;
+
+  for (const file of validFiles) {
+    const url = URL.createObjectURL(file);
+    try {
+      const img = await loadImage(url);
+      const c = document.createElement('canvas');
+      c.width = img.naturalWidth; c.height = img.naturalHeight;
+      c.getContext('2d').drawImage(img, 0, 0);
+      frames.push({ canvas: c, name: file.name });
+    } catch (e) {
+      console.warn('이미지 로드 실패:', file.name);
+    }
+    URL.revokeObjectURL(url);
+  }
+
+  fileDrop.innerHTML = `<div class="icon">✅</div><p>총 ${frames.length}프레임 로드 완료<br><span style="font-size:11px;color:#888;">추가로 더 넣을 수 있습니다</span></p>`;
+  renderFrameList();
+  document.getElementById('runBtn').disabled = frames.length === 0;
+}
+
+// ══════════════════════════
+// 공통 유틸리티
+// ══════════════════════════
+
+function hasVisiblePixels(canvas) {
+  const ctx = canvas.getContext('2d');
+  const data = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
+  for (let i = 3; i < data.length; i += 4) {
+    if (data[i] > 10) return true;
+  }
+  return false;
+}
+
+// ── 프레임 리스트 UI ──
+function renderFrameList() {
+  const list = document.getElementById('frameList');
+  list.innerHTML = '';
+
+  frames.forEach((frame, i) => {
+    const div = document.createElement('div');
+    div.className = 'frame-item';
+
+    const thumb = document.createElement('canvas');
+    thumb.width = 56; thumb.height = 56;
+    const tCtx = thumb.getContext('2d');
+    const scale = Math.min(56 / frame.canvas.width, 56 / frame.canvas.height);
+    const dw = frame.canvas.width * scale;
+    const dh = frame.canvas.height * scale;
+    tCtx.drawImage(frame.canvas, (56 - dw) / 2, (56 - dh) / 2, dw, dh);
+
+    const numSpan = document.createElement('span');
+    numSpan.className = 'frame-num';
+    numSpan.textContent = '#' + (i + 1);
+
+    const nameSpan = document.createElement('span');
+    nameSpan.className = 'frame-name';
+    nameSpan.textContent = frame.name;
+
+    const delayInput = document.createElement('input');
+    delayInput.type = 'number';
+    delayInput.value = '0.1';
+    delayInput.min = '0.01';
+    delayInput.max = '10';
+    delayInput.step = '0.01';
+    delayInput.className = 'frame-delay';
+
+    const secLabel = document.createElement('span');
+    secLabel.className = 'unit';
+    secLabel.textContent = '초';
+
+    const removeBtn = document.createElement('button');
+    removeBtn.className = 'remove-btn';
+    removeBtn.textContent = '✕';
+    removeBtn.onclick = () => {
+      frames.splice(i, 1);
+      renderFrameList();
+      document.getElementById('runBtn').disabled = frames.length === 0;
+    };
+
+    div.appendChild(numSpan);
+    div.appendChild(thumb);
+    div.appendChild(nameSpan);
+    div.appendChild(delayInput);
+    div.appendChild(secLabel);
+    div.appendChild(removeBtn);
+    list.appendChild(div);
+  });
+}
+
+function applyGlobalDelay() {
+  const val = document.getElementById('globalDelay').value;
+  document.querySelectorAll('.frame-delay').forEach(inp => inp.value = val);
+}
+
+// ══════════════════════════
+// 아웃라인 (테두리) 엔진
+// ══════════════════════════
+
+function addBorderToCanvas(srcCanvas, radius, color) {
+  const sw = srcCanvas.width, sh = srcCanvas.height;
+  const sCtx = srcCanvas.getContext('2d');
+  const srcData = sCtx.getImageData(0, 0, sw, sh).data;
+
+  const pad = radius;
+  const dw = sw + pad * 2, dh = sh + pad * 2;
+  const dst = document.createElement('canvas');
+  dst.width = dw; dst.height = dh;
+  const dCtx = dst.getContext('2d');
+
+  const cr = parseInt(color.slice(1, 3), 16);
+  const cg = parseInt(color.slice(3, 5), 16);
+  const cb = parseInt(color.slice(5, 7), 16);
+
+  const alpha = new Uint8Array(sw * sh);
+  for (let i = 0; i < sw * sh; i++) alpha[i] = srcData[i * 4 + 3];
+
+  const outData = dCtx.createImageData(dw, dh);
+  const out = outData.data;
+  const r2 = radius * radius;
+
+  for (let y = 0; y < dh; y++) {
+    for (let x = 0; x < dw; x++) {
+      const sx = x - pad, sy = y - pad;
+      let maxA = 0;
+      const yStart = Math.max(0, sy - radius);
+      const yEnd = Math.min(sh - 1, sy + radius);
+      const xStart = Math.max(0, sx - radius);
+      const xEnd = Math.min(sw - 1, sx + radius);
+      for (let ky = yStart; ky <= yEnd; ky++) {
+        const dy2 = (ky - sy) * (ky - sy);
+        for (let kx = xStart; kx <= xEnd; kx++) {
+          if ((kx - sx) * (kx - sx) + dy2 <= r2) {
+            const a = alpha[ky * sw + kx];
+            if (a > maxA) maxA = a;
+          }
+        }
+      }
+      const idx = (y * dw + x) * 4;
+      if (maxA > 0) {
+        out[idx] = cr;
+        out[idx + 1] = cg;
+        out[idx + 2] = cb;
+        out[idx + 3] = maxA;
+      }
+    }
+  }
+
+  dCtx.putImageData(outData, 0, 0);
+  dCtx.drawImage(srcCanvas, pad, pad);
+  return dst;
+}
+
+// PNG 모드용 전체 아웃라인
+function addBorderToFrame(srcCanvas, radius, color) {
+  return addBorderToCanvas(srcCanvas, radius, color);
+}
+
+// ══════════════════════════════════════
+// WebP 애니메이션 인코더 (수정 v2)
+// ══════════════════════════════════════
+
+async function encodeAnimatedWebP(canvasFrames, delaysMs) {
+  const width = canvasFrames[0].width;
+  const height = canvasFrames[0].height;
+
+  // 각 프레임을 정적 WebP로 인코딩
+  const frameBlobs = [];
+  for (const canvas of canvasFrames) {
+    const blob = await new Promise(resolve =>
+      canvas.toBlob(b => resolve(b), 'image/webp', 0.90)
+    );
+    frameBlobs.push(new Uint8Array(await blob.arrayBuffer()));
+  }
+
+  // 각 WebP에서 프레임 데이터 추출
+  const frameDataList = frameBlobs.map(extractFrameData);
+  const hasAlpha = frameDataList.some(fd => fd.hasAlpha);
+
+  // VP8X 청크
+  const vp8xPayload = new Uint8Array(10);
+  let flags = 0x02; // animation
+  if (hasAlpha) flags |= 0x10; // alpha
+  vp8xPayload[0] = flags;
+  write24LE(vp8xPayload, 4, width - 1);
+  write24LE(vp8xPayload, 7, height - 1);
+
+  // ANIM 청크
+  const animPayload = new Uint8Array(6);
+  // bg = transparent, loop = 0 (infinite)
+
+  // ANMF 청크들
+  const anmfPayloads = [];
+  for (let i = 0; i < frameDataList.length; i++) {
+    const fd = frameDataList[i];
+    const ms = delaysMs[i];
+
+    const payload = new Uint8Array(16 + fd.bytes.length);
+    // X offset / 2
+    write24LE(payload, 0, 0);
+    // Y offset / 2
+    write24LE(payload, 3, 0);
+    // width - 1
+    write24LE(payload, 6, width - 1);
+    // height - 1
+    write24LE(payload, 9, height - 1);
+    // duration ms
+    write24LE(payload, 12, ms);
+    // flags: blend=0 (alpha blend), dispose=0
+    payload[15] = 0x00;
+    // frame data
+    payload.set(fd.bytes, 16);
+
+    anmfPayloads.push(payload);
+  }
+
+  // RIFF 조립
+  const chunks = [];
+  chunks.push(makeChunk('VP8X', vp8xPayload));
+  chunks.push(makeChunk('ANIM', animPayload));
+  for (const p of anmfPayloads) {
+    chunks.push(makeChunk('ANMF', p));
+  }
+
+  let totalChunksSize = 0;
+  for (const c of chunks) totalChunksSize += c.length;
+
+  const riff = new Uint8Array(12 + totalChunksSize);
+  // "RIFF"
+  riff[0] = 0x52; riff[1] = 0x49; riff[2] = 0x46; riff[3] = 0x46;
+  writeU32LE(riff, 4, 4 + totalChunksSize); // filesize - 8
+  // "WEBP"
+  riff[8] = 0x57; riff[9] = 0x45; riff[10] = 0x42; riff[11] = 0x50;
+
+  let offset = 12;
+  for (const chunk of chunks) {
+    riff.set(chunk, offset);
+    offset += chunk.length;
+  }
+
+  return new Blob([riff], { type: 'image/webp' });
+}
+
+function extractFrameData(webpBytes) {
+  let pos = 12; // skip RIFF header
+  const chunks = [];
+  let hasAlpha = false;
+
+  while (pos + 8 <= webpBytes.length) {
+    const tag = str4(webpBytes, pos);
+    const size = readU32LE(webpBytes, pos + 4);
+    const chunkTotal = 8 + size + (size % 2);
+
+    if (tag === 'VP8L') {
+      hasAlpha = true;
+      chunks.push(webpBytes.slice(pos, pos + 8 + size + (size % 2)));
+    } else if (tag === 'VP8 ') {
+      chunks.push(webpBytes.slice(pos, pos + 8 + size + (size % 2)));
+    } else if (tag === 'ALPH') {
+      hasAlpha = true;
+      chunks.push(webpBytes.slice(pos, pos + 8 + size + (size % 2)));
+    }
+
+    pos += chunkTotal;
+  }
+
+  let totalLen = 0;
+  for (const c of chunks) totalLen += c.length;
+  const bytes = new Uint8Array(totalLen);
+  let off = 0;
+  for (const c of chunks) { bytes.set(c, off); off += c.length; }
+
+  return { bytes, hasAlpha };
+}
+
+function makeChunk(tag, payload) {
+  const padded = payload.length % 2 !== 0;
+  const chunk = new Uint8Array(8 + payload.length + (padded ? 1 : 0));
+  for (let i = 0; i < 4; i++) chunk[i] = tag.charCodeAt(i);
+  writeU32LE(chunk, 4, payload.length);
+  chunk.set(payload, 8);
+  return chunk;
+}
+
+function str4(buf, offset) {
+  return String.fromCharCode(buf[offset], buf[offset+1], buf[offset+2], buf[offset+3]);
+}
+
+function readU32LE(buf, o) {
+  return buf[o] | (buf[o+1] << 8) | (buf[o+2] << 16) | ((buf[o+3] << 24) >>> 0);
+}
+
+function writeU32LE(buf, o, v) {
+  buf[o] = v & 0xFF; buf[o+1] = (v >> 8) & 0xFF;
+  buf[o+2] = (v >> 16) & 0xFF; buf[o+3] = (v >> 24) & 0xFF;
+}
+
+function write24LE(buf, o, v) {
+  buf[o] = v & 0xFF; buf[o+1] = (v >> 8) & 0xFF; buf[o+2] = (v >> 16) & 0xFF;
+}
+
+// ══════════════════════════
+// 생성 실행
+// ══════════════════════════
+
+async function generateWebP() {
+  if (frames.length === 0) return;
+
+  const useOutline = document.getElementById('outlineToggle').checked;
+  const borderSize = parseInt(document.getElementById('borderSize').value) || 8;
+  const borderColor = document.getElementById('borderColor').value;
+  const btn = document.getElementById('runBtn');
+  const progressBar = document.getElementById('progressBar');
+  const progressFill = document.getElementById('progressFill');
+
+  btn.disabled = true;
+  btn.textContent = '생성 중...';
+  progressBar.style.display = 'block';
+  progressFill.style.width = '0%';
+
+  const delayInputs = document.querySelectorAll('.frame-delay');
+  const delaysMs = Array.from(delayInputs).map(inp => {
+    return Math.round((parseFloat(inp.value) || 0.1) * 1000);
+  });
+
+  let processedFrames = [];
+  const total = frames.length;
+
+  for (let i = 0; i < total; i++) {
+    progressFill.style.width = ((i / total) * 80) + '%';
+
+    if (inputMode === 'png' && useOutline) {
+      // PNG 모드: 전체에 아웃라인
+      processedFrames.push(addBorderToFrame(frames[i].canvas, borderSize, borderColor));
+    } else {
+      // PSD 모드: 이미 processPsdGroup에서 아웃라인 적용됨
+      // 또는 아웃라인 OFF
+      processedFrames.push(frames[i].canvas);
+    }
+
+    await new Promise(r => setTimeout(r, 5));
+  }
+
+  // 모든 프레임 크기 통일
+  const maxW = Math.max(...processedFrames.map(c => c.width));
+  const maxH = Math.max(...processedFrames.map(c => c.height));
+
+  const uniformFrames = processedFrames.map(c => {
+    if (c.width === maxW && c.height === maxH) return c;
+    const uc = document.createElement('canvas');
+    uc.width = maxW; uc.height = maxH;
+    uc.getContext('2d').drawImage(c, Math.round((maxW - c.width) / 2), Math.round((maxH - c.height) / 2));
+    return uc;
+  });
+
+  progressFill.style.width = '85%';
+
+  try {
+    resultBlob = await encodeAnimatedWebP(uniformFrames, delaysMs);
+    progressFill.style.width = '100%';
+
+    const resultArea = document.getElementById('resultArea');
+    const resultImg = document.getElementById('resultImg');
+    const resultInfo = document.getElementById('resultInfo');
+
+    resultImg.src = URL.createObjectURL(resultBlob);
+    resultArea.style.display = 'block';
+
+    const sizeKB = (resultBlob.size / 1024).toFixed(1);
+    const totalSec = delaysMs.reduce((a, b) => a + b, 0) / 1000;
+    resultInfo.textContent = `${total}프레임 · ${totalSec.toFixed(2)}초 · ${sizeKB} KB · ${maxW} × ${maxH}px`;
+    btn.textContent = '✅ 완료! 다시 생성하려면 클릭';
+  } catch (err) {
+    console.error('WebP 생성 오류:', err);
+    btn.textContent = '❌ 오류: ' + err.message;
+  }
+
+  btn.disabled = false;
+  setTimeout(() => { progressBar.style.display = 'none'; }, 1000);
+}
+
+function downloadResult() {
+  if (!resultBlob) return;
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(resultBlob);
+  a.download = 'animation.webp';
+  a.click();
+}
+</script>
+
+</body>
+</html>
