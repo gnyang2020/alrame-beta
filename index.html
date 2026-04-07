@@ -68,6 +68,14 @@ input[type=color] { width: 40px; height: 34px; border: 2px solid #DDD; border-ra
 .target-option.selected.png-theme { border-color: #2196F3; background: #F0F7FF; }
 .target-option.selected.png-theme .radio-dot { border-color: #2196F3; background: #2196F3; }
 .target-option:not(.selected).png-theme:hover { border-color: #64B5F6; }
+/* GIF 테마 */
+.target-option.selected.gif-theme { border-color: #AB47BC; background: #F9F0FF; }
+.target-option.selected.gif-theme .radio-dot { border-color: #AB47BC; background: #AB47BC; }
+.target-option.selected.gif-theme .option-label { color: #333; }
+.target-option:not(.selected).gif-theme:hover { border-color: #CE93D8; }
+.badge-gif { background: #F3E5F5; color: #7B1FA2; }
+.out-toggle.gif:hover { border-color:#AB47BC; background:#F9F0FF; }
+.out-toggle.gif.active { border-color:#AB47BC; background:#F3E5F5; color:#7B1FA2; font-weight:700; }
 /* 안내사항 */
 .option-notice { font-size: 10.5px; color: #777; background: #FAFAFA; border: 1.5px dashed #CCC; border-radius: 8px; padding: 10px 12px; margin-top: 10px; line-height: 1.7; }
 /* 출력 토글 */
@@ -170,8 +178,8 @@ PNG 여러 장 · PSD 여러 개 가능<br>PNG + PSD 혼합 불가
 <span class="unit">기본: 흰색</span>
 </div>
 <div style="font-size:11px;line-height:1.8;margin-bottom:14px;">
-<span style="color:#333;font-weight:700;">✦ 쥐냥 작가 추천</span> <span style="color:#999;">— 360×360: 4~5px · 740×640: 8px · 1080×1080: 12~15px</span><br>
-<span style="color:#D32F2F;font-weight:600;">테두리 두께는 무조건 원본 레이어 기준으로 선택해 주세요. 예) 1080×1080의 경우 12 선택</span>
+<span style="color:#333;font-weight:700;">✦ 쥐냥 작가 추천</span> <span style="color:#999;">— 360×360: 4~5px · 740×640: 8px</span><br>
+<span style="color:#D32F2F;font-weight:600;">테두리 두께는 최종 출력 크기 기준으로 선택해 주세요. 큰 PSD는 자동 축소 후 적용됩니다</span>
 </div>
 
 <!-- 핑크 안내 바 -->
@@ -199,7 +207,7 @@ PNG 여러 장 · PSD 여러 개 가능<br>PNG + PSD 혼합 불가
 </label>
 </div>
 <div class="option-notice">
-PSD 파일 내에 폴더를 정리해서 넣어주세요.<br>
+PSD 1개에 시안을 여러 개 만든다면 반드시 각 시안을 폴더로 묶어주세요.<br>
 폴더·레이어 명은 상관 없습니다.<br>
 그룹별 제일 상단에 텍스트 레이어를 위치하게 해주세요.<br>
 텍스트가 없는 시안의 경우 최상단에 빈 레이어를 꼭 넣어주세요.<br>
@@ -214,35 +222,34 @@ PSD 파일 내에 폴더를 정리해서 넣어주세요.<br>
 <div class="radio-dot"></div>
 <div class="option-text">
 <div class="option-label">네이버 OGQ 스티커 전용 <span class="badge badge-naver">NAVER</span></div>
-<div class="option-desc">시안 전체에 아웃라인 적용</div>
+<div class="option-desc">PSD를 넣으면 PNG로 자동 출력<br>시안 전체에 아웃라인 적용</div>
 <div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap;">
-<label class="out-toggle naver naver-out-btn active" onclick="event.stopPropagation();selectTarget('all-layers');document.querySelectorAll('.naver-out-btn').forEach(b=>b.classList.remove('active'));this.classList.add('active');document.getElementById('gifSettings').style.display='none';">
-<input type="radio" name="naver-output" value="png" checked style="accent-color:#03C75A;"> PNG 출력
+<label class="out-toggle naver naver-out-btn" onclick="event.stopPropagation();selectTarget('all-layers');document.querySelectorAll('.naver-out-btn').forEach(b=>b.classList.remove('active'));this.classList.add('active');document.getElementById('ogqGifSettings').style.display='none';">
+<input type="radio" name="naver-output" value="png740" style="accent-color:#03C75A;"> 740 × 640 자동 변환
 </label>
-<label class="out-toggle naver naver-out-btn" onclick="event.stopPropagation();selectTarget('all-layers');document.querySelectorAll('.naver-out-btn').forEach(b=>b.classList.remove('active'));this.classList.add('active');document.getElementById('gifSettings').style.display='none';">
-<input type="radio" name="naver-output" value="png740" style="accent-color:#03C75A;"> 740×640
+<label class="out-toggle naver naver-out-btn" onclick="event.stopPropagation();selectTarget('all-layers');document.querySelectorAll('.naver-out-btn').forEach(b=>b.classList.remove('active'));this.classList.add('active');document.getElementById('ogqGifSettings').style.display='none';">
+<input type="radio" name="naver-output" value="png" style="accent-color:#03C75A;"> 원본 사이즈 그대로
 </label>
-<label class="out-toggle naver naver-out-btn" onclick="event.stopPropagation();selectTarget('all-layers');document.querySelectorAll('.naver-out-btn').forEach(b=>b.classList.remove('active'));this.classList.add('active');document.getElementById('gifSettings').style.display='block';">
-<input type="radio" name="naver-output" value="gif" style="accent-color:#03C75A;"> GIF 출력
+<label class="out-toggle naver naver-out-btn" onclick="event.stopPropagation();selectTarget('all-layers');document.querySelectorAll('.naver-out-btn').forEach(b=>b.classList.remove('active'));this.classList.add('active');document.getElementById('ogqGifSettings').style.display='block';">
+<input type="radio" name="naver-output" value="ogq-gif" style="accent-color:#03C75A;"> OGQ GIF
 </label>
 </div>
-<div id="gifSettings" style="display:none;margin-top:8px;padding:10px 12px;background:rgba(3,199,90,0.06);border:1px solid rgba(3,199,90,0.15);border-radius:8px;">
-<div style="display:flex;gap:6px;margin-bottom:8px;">
-<button type="button" id="gifModeUniform" onclick="event.stopPropagation();setGifMode('uniform')" style="flex:1;padding:6px 10px;border:2px solid #03C75A;border-radius:8px;background:#e6f9f0;color:#03C75A;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;">모두 동일</button>
-<button type="button" id="gifModePerFrame" onclick="event.stopPropagation();setGifMode('perframe')" style="flex:1;padding:6px 10px;border:2px solid #E0E0E0;border-radius:8px;background:#fff;color:#999;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;">프레임별 설정</button>
-</div>
-<div id="gifUniformRow" style="display:flex;align-items:center;gap:8px;">
+<div id="ogqGifSettings" style="display:none;margin-top:8px;padding:10px 12px;background:rgba(3,199,90,0.06);border:1px solid rgba(3,199,90,0.15);border-radius:8px;">
+<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
 <span style="font-size:11px;font-weight:600;color:#03C75A;">프레임 속도</span>
-<input type="number" id="gifFrameDelay" value="0.12" min="0.01" max="10" step="0.01" onclick="event.stopPropagation()" style="width:70px;padding:5px 8px;border:2px solid #03C75A;border-radius:8px;font-size:13px;font-weight:700;color:#03C75A;background:#fff;outline:none;">
+<input type="number" id="ogqGifDelay" value="0.06" min="0.01" max="10" step="0.01" onclick="event.stopPropagation()" style="width:70px;padding:5px 8px;border:2px solid #03C75A;border-radius:8px;font-size:13px;font-weight:700;color:#03C75A;background:#fff;outline:none;">
 <span style="font-size:11px;color:#666;">초/프레임</span>
 </div>
-<div id="gifPerFrameArea" style="display:none;">
-<div id="gifPerFrameList" style="max-height:200px;overflow-y:auto;" onclick="event.stopPropagation()"></div>
-<p id="gifPerFrameHint" style="font-size:11px;color:#999;text-align:center;padding:8px 0;">파일을 업로드하면 프레임별 설정이 표시됩니다</p>
+<div style="font-size:10.5px;color:#555;line-height:1.7;margin:0;background:#f0faf5;border-radius:6px;padding:8px 10px;">
+<b style="color:#03C75A;">OGQ GIF 자동 변환 규칙</b><br>
+OGQ 특성상 1번 프레임이 앞·뒤로 재생되어야 합니다.<br>
+예) 1, 2, 3 프레임을 넣으면 → <b>1, 2, 2, 3, 3, 1</b>로 자동 변환됩니다.<br><br>
+<b style="color:#D32F2F;">속도는 원하는 값의 절반으로 입력해 주세요.</b><br>
+예) 장당 0.12초를 원하면 → <b>0.06</b> 입력
 </div>
 </div>
 <div class="option-notice">
-PSD 파일 내에 폴더를 정리해서 넣어주세요.<br>
+PSD 1개에 시안을 여러 개 만든다면 반드시 각 시안을 폴더로 묶어주세요.<br>
 폴더·레이어 명은 상관 없습니다.<br>
 필요없는 레이어나 배경 레이어는 꼭 삭제해 주세요.<br>
 GIF 파일의 경우 반드시 네이버 제안 가이드를 확인하고 만들어 주세요.
@@ -257,6 +264,57 @@ GIF 파일의 경우 반드시 네이버 제안 가이드를 확인하고 만들
 <div class="option-text">
 <div class="option-label">PNG 단일 파일 <span class="badge badge-blue">PNG</span></div>
 <div class="option-desc">시안 전체에 아웃라인 적용<br>PSD 없이 PNG 여러 장 올릴 때</div>
+</div>
+</label>
+
+<!-- GIF -->
+<label class="target-option gif-theme" id="opt-gif" onclick="selectTarget('gif-only')">
+<input type="radio" name="target" value="gif-only">
+<div class="radio-dot"></div>
+<div class="option-text">
+<div class="option-label">GIF 출력 <span class="badge badge-gif">GIF</span></div>
+<div class="option-desc">PSD를 넣으면 GIF로 자동 출력</div>
+<!-- 1) 사이즈 선택 -->
+<div style="display:flex;gap:6px;margin-top:8px;">
+<label class="out-toggle gif gif-size-btn" onclick="event.stopPropagation();selectTarget('gif-only');document.querySelectorAll('.gif-size-btn').forEach(b=>b.classList.remove('active'));this.classList.add('active');">
+<input type="radio" name="gif-size" value="original" style="accent-color:#AB47BC;"> 원본 사이즈
+</label>
+<label class="out-toggle gif gif-size-btn" onclick="event.stopPropagation();selectTarget('gif-only');document.querySelectorAll('.gif-size-btn').forEach(b=>b.classList.remove('active'));this.classList.add('active');">
+<input type="radio" name="gif-size" value="360" style="accent-color:#AB47BC;"> 360 × 360
+</label>
+<label class="out-toggle gif gif-size-btn" onclick="event.stopPropagation();selectTarget('gif-only');document.querySelectorAll('.gif-size-btn').forEach(b=>b.classList.remove('active'));this.classList.add('active');">
+<input type="radio" name="gif-size" value="740" style="accent-color:#AB47BC;"> 740 × 640
+</label>
+</div>
+<!-- 2) 테두리 선택 -->
+<div style="display:flex;gap:6px;margin-top:6px;">
+<label class="out-toggle gif gif-border-btn" onclick="event.stopPropagation();selectTarget('gif-only');document.querySelectorAll('.gif-border-btn').forEach(b=>b.classList.remove('active'));this.classList.add('active');">
+<input type="radio" name="gif-border" value="text" style="accent-color:#AB47BC;"> 텍스트만 테두리
+</label>
+<label class="out-toggle gif gif-border-btn" onclick="event.stopPropagation();selectTarget('gif-only');document.querySelectorAll('.gif-border-btn').forEach(b=>b.classList.remove('active'));this.classList.add('active');">
+<input type="radio" name="gif-border" value="all" style="accent-color:#AB47BC;"> 전체 테두리
+</label>
+</div>
+<!-- 3) 프레임 속도 -->
+<div id="gifOnlySettings" style="margin-top:8px;padding:10px 12px;background:rgba(171,71,188,0.06);border:1px solid rgba(171,71,188,0.15);border-radius:8px;">
+<div style="display:flex;gap:6px;margin-bottom:8px;">
+<button type="button" id="gifOnlyModeUniform" onclick="event.stopPropagation();setGifOnlyMode('uniform')" style="flex:1;padding:6px 10px;border:2px solid #AB47BC;border-radius:8px;background:#F3E5F5;color:#AB47BC;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;">모두 동일</button>
+<button type="button" id="gifOnlyModePerFrame" onclick="event.stopPropagation();setGifOnlyMode('perframe')" style="flex:1;padding:6px 10px;border:2px solid #E0E0E0;border-radius:8px;background:#fff;color:#999;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;">프레임별 설정</button>
+</div>
+<div id="gifOnlyUniformRow" style="display:flex;align-items:center;gap:8px;">
+<span style="font-size:11px;font-weight:600;color:#AB47BC;">프레임 속도</span>
+<input type="number" id="gifOnlyFrameDelay" value="0.13" min="0.01" max="10" step="0.01" onclick="event.stopPropagation()" style="width:70px;padding:5px 8px;border:2px solid #AB47BC;border-radius:8px;font-size:13px;font-weight:700;color:#AB47BC;background:#fff;outline:none;">
+<span style="font-size:11px;color:#666;">초/프레임</span>
+</div>
+<div id="gifOnlyPerFrameArea" style="display:none;">
+<div id="gifOnlyPerFrameList" style="max-height:200px;overflow-y:auto;" onclick="event.stopPropagation()"></div>
+<p id="gifOnlyPerFrameHint" style="font-size:10.5px;color:#999;text-align:center;padding:8px 0;">파일을 업로드하면 프레임별 설정이 표시됩니다</p>
+</div>
+</div>
+<div class="option-notice">
+PSD 1개에 시안을 여러 개 만든다면 반드시 각 시안을 폴더로 묶어주세요.<br>
+PSD 여러 개를 넣으면 각각 GIF로 변환됩니다. 2개 이상은 ZIP으로 다운로드됩니다.
+</div>
 </div>
 </label>
 
@@ -447,6 +505,97 @@ function getGifDelays(frameCount, fileIndex) {
   return delays;
 }
 
+/* ── GIF 전용 섹션: 상태 & 함수 ── */
+let gifOnlyMode = 'uniform';
+
+function getGifBorderMode() {
+  const el = document.querySelector('input[name="gif-border"]:checked');
+  return el ? el.value : 'text';
+}
+
+function getGifSizeMode() {
+  const el = document.querySelector('input[name="gif-size"]:checked');
+  return el ? el.value : 'original';
+}
+
+function getOgqGifDelay() {
+  const val = parseFloat(document.getElementById('ogqGifDelay').value) || 0.06;
+  return Math.round(val * 1000);
+}
+
+function setGifOnlyMode(mode) {
+  gifOnlyMode = mode;
+  const uniformBtn = document.getElementById('gifOnlyModeUniform');
+  const perFrameBtn = document.getElementById('gifOnlyModePerFrame');
+  const uniformRow = document.getElementById('gifOnlyUniformRow');
+  const perFrameArea = document.getElementById('gifOnlyPerFrameArea');
+  if (mode === 'uniform') {
+    uniformBtn.style.borderColor = '#AB47BC'; uniformBtn.style.background = '#F3E5F5'; uniformBtn.style.color = '#AB47BC';
+    perFrameBtn.style.borderColor = '#E0E0E0'; perFrameBtn.style.background = '#fff'; perFrameBtn.style.color = '#999';
+    uniformRow.style.display = 'flex'; perFrameArea.style.display = 'none';
+  } else {
+    perFrameBtn.style.borderColor = '#AB47BC'; perFrameBtn.style.background = '#F3E5F5'; perFrameBtn.style.color = '#AB47BC';
+    uniformBtn.style.borderColor = '#E0E0E0'; uniformBtn.style.background = '#fff'; uniformBtn.style.color = '#999';
+    uniformRow.style.display = 'none'; perFrameArea.style.display = 'block';
+    if (files.length > 0) detectAllFrameCounts().then(() => populateGifOnlyPerFrameInputs());
+  }
+}
+
+function populateGifOnlyPerFrameInputs() {
+  const list = document.getElementById('gifOnlyPerFrameList');
+  const hint = document.getElementById('gifOnlyPerFrameHint');
+  const defaultDelay = document.getElementById('gifOnlyFrameDelay').value || '0.13';
+  list.innerHTML = '';
+  if (!detectedFiles.length) { hint.style.display = 'block'; return; }
+  hint.style.display = 'none';
+  for (let fi = 0; fi < detectedFiles.length; fi++) {
+    const fileInfo = detectedFiles[fi];
+    if (detectedFiles.length > 1) {
+      const header = document.createElement('div');
+      header.style.cssText = 'font-size:12px;font-weight:700;color:#333;padding:6px 0 4px;border-top:1px solid #E0E0E0;margin-top:6px;';
+      if (fi === 0) header.style.borderTop = 'none';
+      header.textContent = '\ud83d\udcc1 ' + fileInfo.name + ' (' + fileInfo.frameCount + '\ud504\ub808\uc784)';
+      list.appendChild(header);
+    }
+    for (let i = 0; i < fileInfo.frameCount; i++) {
+      const row = document.createElement('div');
+      row.style.cssText = 'display:flex;align-items:center;gap:8px;margin-bottom:4px;';
+      row.innerHTML =
+        '<span style="font-size:11px;color:#555;min-width:60px;font-weight:600;">\ud504\ub808\uc784 ' + (i + 1) + '</span>' +
+        '<input type="number" class="gif-only-per-frame-input" data-file="' + fi + '" data-frame="' + i + '" value="' + defaultDelay + '" min="0.01" max="10" step="0.01" style="width:70px;padding:4px 8px;border:2px solid #AB47BC;border-radius:8px;font-size:12px;font-weight:700;color:#AB47BC;background:#fff;outline:none;">' +
+        '<span style="font-size:11px;color:#666;">\ucd08</span>';
+      list.appendChild(row);
+    }
+  }
+}
+
+function getGifOnlyDelays(frameCount, fileIndex) {
+  if (gifOnlyMode === 'uniform') {
+    const delay = parseFloat(document.getElementById('gifOnlyFrameDelay').value) || 0.13;
+    return Array(frameCount).fill(Math.round(delay * 1000));
+  }
+  const inputs = document.querySelectorAll('.gif-only-per-frame-input[data-file="' + fileIndex + '"]');
+  const delays = [];
+  for (let i = 0; i < frameCount; i++) {
+    const input = inputs[i];
+    const val = input ? parseFloat(input.value) || 0.13 : 0.13;
+    delays.push(Math.round(val * 1000));
+  }
+  return delays;
+}
+
+/* ── OGQ 스타일 프레임 배치: 1→2,2→3,3→...N,N→1 ── */
+function rearrangeForOGQ(canvases, delay) {
+  const out = []; const delays = [];
+  out.push(canvases[0]); delays.push(delay);
+  for (let i = 1; i < canvases.length; i++) {
+    out.push(canvases[i]); delays.push(delay);
+    out.push(canvases[i]); delays.push(delay);
+  }
+  out.push(canvases[0]); delays.push(delay);
+  return { canvases: out, delays: delays };
+}
+
 /* ── 캔버스 리사이즈 ── */
 function resizeCanvas(srcCanvas, targetW, targetH) {
   const out = document.createElement('canvas');
@@ -519,6 +668,7 @@ async function detectAllFrameCounts() {
     try {
       const buf = await file.arrayBuffer();
       const psd = window.agPsd.readPsd(buf, { loadThumbnail: false, skipLayerImageData: true });
+      unwrapAnimationFolder(psd);
       const folders = (psd.children || []).filter(c => c.children && c.children.length > 0);
       const layers = (psd.children || []).filter(c => !c.children || c.children.length === 0);
       const count = folders.length > 0 ? folders.length : layers.length;
@@ -921,6 +1071,18 @@ function createGifFromCanvases(canvases, delays) {
   });
 }
 
+/* ── 애니메이션 폴더 래퍼 자동 해제 ── */
+function unwrapAnimationFolder(psd) {
+  const children = psd.children || [];
+  const folders = children.filter(c => c.children && c.children.length > 0);
+  if (folders.length === 1) {
+    const subFolders = (folders[0].children || []).filter(c => c.children && c.children.length > 0);
+    if (subFolders.length >= 2) {
+      psd.children = folders[0].children;
+    }
+  }
+}
+
 /* ── 메인 실행 ── */
 async function run() {
   if (!files.length) return;
@@ -946,19 +1108,41 @@ async function run() {
         const { readPsd, writePsd } = window.agPsd;
         const buf = await file.arrayBuffer();
         const psd = readPsd(buf, { loadThumbnail: false });
+        unwrapAnimationFolder(psd);
         let previews = [];
 
         if (mode === 'top-of-group') {
           /* ── 카카오 모드 ── */
+          const kakaoOutput = getKakaoOutputMode();
+          const kakaoAutoResize = (getKakaoSizeMode() === 'auto');
+          const psdW = psd.width, psdH = psd.height;
+
+          /* PNG 출력 + 자동축소 → 먼저 360으로 축소 후 테두리 처리 (성능 최적화) */
+          if (kakaoOutput === 'png' && kakaoAutoResize && (psdW > 360 || psdH > 360)) {
+            const scale = 360 / Math.max(psdW, psdH);
+            setStatus('큰 PSD 축소 중 (' + psdW + '×' + psdH + ' → 360×360)...');
+            psd.width = Math.round(psdW * scale);
+            psd.height = Math.round(psdH * scale);
+            function resizePsdLayersKakaoPre(node) {
+              if (node.canvas) {
+                const lw = (node.right || 0) - (node.left || 0);
+                const lh = (node.bottom || 0) - (node.top || 0);
+                node.canvas = resizeCanvas(node.canvas, Math.max(1, Math.round(lw * scale)), Math.max(1, Math.round(lh * scale)));
+                node.left = Math.round((node.left || 0) * scale);
+                node.top = Math.round((node.top || 0) * scale);
+                node.right = Math.round((node.right || 0) * scale);
+                node.bottom = Math.round((node.bottom || 0) * scale);
+              }
+              if (node.children) node.children.forEach(resizePsdLayersKakaoPre);
+            }
+            psd.children.forEach(resizePsdLayersKakaoPre);
+          }
+
           setStatus('카카오 PSD 처리 중...');
           previews = await processPsdTopOfGroup(psd, radius, color, p => {
             setProgress(p * 100);
             setStatus('그룹별 최상위 레이어 처리 중: ' + Math.round(p * 100) + '%');
           });
-
-          const kakaoOutput = getKakaoOutputMode();
-          const kakaoAutoResize = (getKakaoSizeMode() === 'auto');
-          const psdW = psd.width, psdH = psd.height;
           const mergedCanvases = previews.map(p => {
             let mc = mergeFolderToCanvas(p.folder, p.psdW, p.psdH);
             if (kakaoAutoResize && (mc.width > 360 || mc.height > 360)) {
@@ -1012,14 +1196,155 @@ async function run() {
             setStatus('완성! ' + previews.length + '개 폴더 처리 완료');
           }
 
+        } else if (mode === 'gif-only') {
+          /* ── GIF 전용 모드 ── */
+          const gifBorderMode = getGifBorderMode();
+          const gifSizeMode = getGifSizeMode();
+          let gifFrames = [];
+
+          /* 사이즈 변환: 360 또는 740×640 선택 시 PSD를 먼저 축소 */
+          if (gifSizeMode === '360' && (psd.width > 360 || psd.height > 360)) {
+            const scale = 360 / Math.max(psd.width, psd.height);
+            setStatus('PSD 축소 중 (' + psd.width + '×' + psd.height + ' → 360×360)...');
+            psd.width = Math.round(psd.width * scale); psd.height = Math.round(psd.height * scale);
+            function resizeGifPsd360(node) {
+              if (node.canvas) {
+                const lw = (node.right||0)-(node.left||0), lh = (node.bottom||0)-(node.top||0);
+                node.canvas = resizeCanvas(node.canvas, Math.max(1,Math.round(lw*scale)), Math.max(1,Math.round(lh*scale)));
+                node.left=Math.round((node.left||0)*scale); node.top=Math.round((node.top||0)*scale);
+                node.right=Math.round((node.right||0)*scale); node.bottom=Math.round((node.bottom||0)*scale);
+              }
+              if (node.children) node.children.forEach(resizeGifPsd360);
+            }
+            psd.children.forEach(resizeGifPsd360);
+          } else if (gifSizeMode === '740') {
+            const maxDim = Math.max(psd.width, psd.height);
+            if (maxDim > 640) {
+              const scW = psd.width / 740, scH = psd.height / 640;
+              const is740m = Math.abs(scW - scH) < 0.01;
+              let targetW, targetH;
+              if (is740m) { targetW = 740; targetH = 640; }
+              else { const s = 640 / maxDim; targetW = Math.round(psd.width * s); targetH = Math.round(psd.height * s); }
+              const scale = targetW / psd.width;
+              setStatus('PSD 축소 중 (' + psd.width + '×' + psd.height + ' → ' + targetW + '×' + targetH + ')...');
+              psd.width = targetW; psd.height = targetH;
+              function resizeGifPsd740(node) {
+                if (node.canvas) {
+                  const lw = (node.right||0)-(node.left||0), lh = (node.bottom||0)-(node.top||0);
+                  node.canvas = resizeCanvas(node.canvas, Math.max(1,Math.round(lw*scale)), Math.max(1,Math.round(lh*scale)));
+                  node.left=Math.round((node.left||0)*scale); node.top=Math.round((node.top||0)*scale);
+                  node.right=Math.round((node.right||0)*scale); node.bottom=Math.round((node.bottom||0)*scale);
+                }
+                if (node.children) node.children.forEach(resizeGifPsd740);
+              }
+              psd.children.forEach(resizeGifPsd740);
+            }
+          }
+
+          if (gifBorderMode === 'text') {
+            /* 텍스트만 테두리 (카카오 방식) */
+            setStatus('텍스트만 테두리 처리 중...');
+            previews = await processPsdTopOfGroup(psd, radius, color, p => {
+              setProgress(p * 100);
+              setStatus('그룹별 최상위 레이어 처리 중: ' + Math.round(p * 100) + '%');
+            });
+            gifFrames = previews.map(p => ({
+              canvas: mergeFolderToCanvas(p.folder, p.psdW, p.psdH),
+              name: p.name
+            }));
+          } else {
+            /* 전체 테두리 (네이버 방식) */
+            setStatus('전체 테두리 처리 중...');
+            previews = await processPsdAllLayers(psd, radius, color, p => {
+              setProgress(p * 100);
+              setStatus('전체 레이어 처리 중: ' + Math.round(p * 100) + '%');
+            });
+            gifFrames = previews.map(p => {
+              const fullW = p.psdW || psd.width, fullH = p.psdH || psd.height;
+              const full = document.createElement('canvas');
+              full.width = fullW; full.height = fullH;
+              full.getContext('2d').drawImage(p.canvas, p.left || 0, p.top || 0);
+              return { canvas: full, name: p.name };
+            });
+          }
+
+          /* 740×640 선택 시 최종 프레임을 740×640으로 변환 */
+          if (gifSizeMode === '740') {
+            gifFrames = gifFrames.map(f => {
+              const src = f.canvas;
+              const scW = src.width / 740, scH = src.height / 640;
+              const is740 = Math.abs(scW - scH) < 0.01 && Math.abs(scW - 1) < 0.01;
+              if (is740) return f;
+              const maxScale = Math.min(640 / src.width, 640 / src.height);
+              const sw = Math.round(src.width * maxScale), sh = Math.round(src.height * maxScale);
+              const sq = document.createElement('canvas'); sq.width = 640; sq.height = 640;
+              sq.getContext('2d').drawImage(src, Math.round((640-sw)/2), Math.round((640-sh)/2), sw, sh);
+              const fin = document.createElement('canvas'); fin.width = 740; fin.height = 640;
+              fin.getContext('2d').drawImage(sq, 50, 0);
+              return { canvas: fin, name: f.name };
+            });
+          }
+
+          gifFrames.slice(0, 6).forEach(p => addPreview(p.canvas, p.name));
+
+          if (gifFrames.length > 0) {
+            setStatus('GIF 생성 중...');
+            const gifCanvases = gifFrames.map(p => p.canvas);
+            const delays = getGifOnlyDelays(gifCanvases.length, psdFileIndex);
+            const gifBlob = await createGifFromCanvases(gifCanvases, delays);
+            const gifName = file.name.replace(/\.psd$/i, '_outlined.gif');
+            resultBlobs.push({ name: gifName, blob: gifBlob });
+            setStatus('완성! GIF 생성 완료 (' + gifFrames.length + '프레임)');
+            psdFileIndex++;
+          }
+
         } else {
           /* ── 네이버 모드 ── */
+          const naverOutput = getNaverOutputMode();
+
+          /* 740×640 자동변환 → 먼저 축소 후 테두리 처리 (성능 최적화) */
+          let preResized = false;
+          if (naverOutput === 'png740' || naverOutput === 'ogq-gif') {
+            const scW = psd.width / 740, scH = psd.height / 640;
+            const is740multiple = Math.abs(scW - scH) < 0.01;
+            const maxDim = Math.max(psd.width, psd.height);
+            const needsDownscale = is740multiple ? (scW > 1.01) : (maxDim > 640);
+            if (needsDownscale) {
+              let targetW, targetH;
+              if (is740multiple) {
+                targetW = 740; targetH = 640;
+              } else {
+                // 정사각형 등: 긴 변을 640에 맞춤
+                const scale = 640 / maxDim;
+                targetW = Math.round(psd.width * scale);
+                targetH = Math.round(psd.height * scale);
+              }
+              const scale = targetW / psd.width;
+              setStatus('큰 PSD 축소 중 (' + psd.width + '×' + psd.height + ' → ' + targetW + '×' + targetH + ')...');
+              psd.width = targetW;
+              psd.height = targetH;
+              function resizePsdLayersNaver(node) {
+                if (node.canvas) {
+                  const lw = (node.right || 0) - (node.left || 0);
+                  const lh = (node.bottom || 0) - (node.top || 0);
+                  node.canvas = resizeCanvas(node.canvas, Math.max(1, Math.round(lw * scale)), Math.max(1, Math.round(lh * scale)));
+                  node.left = Math.round((node.left || 0) * scale);
+                  node.top = Math.round((node.top || 0) * scale);
+                  node.right = Math.round((node.right || 0) * scale);
+                  node.bottom = Math.round((node.bottom || 0) * scale);
+                }
+                if (node.children) node.children.forEach(resizePsdLayersNaver);
+              }
+              psd.children.forEach(resizePsdLayersNaver);
+              preResized = true;
+            }
+          }
+
           previews = await processPsdAllLayers(psd, radius, color, p => {
             setProgress(p * 100);
             setStatus('전체 레이어 처리 중: ' + Math.round(p * 100) + '%');
           });
 
-          const naverOutput = getNaverOutputMode();
           const naverPreviews = previews.map(p => {
             const fullW = p.psdW || psd.width, fullH = p.psdH || psd.height;
             const full = document.createElement('canvas');
@@ -1030,15 +1355,28 @@ async function run() {
           });
           naverPreviews.slice(0, 6).forEach(p => addPreview(p.canvas, p.name));
 
-          if (naverOutput === 'gif') {
-            /* ── GIF 생성 ── */
-            setStatus('GIF 생성 중...');
-            const gifCanvases = naverPreviews.map(p => p.canvas);
-            const delays = getGifDelays(gifCanvases.length, psdFileIndex);
-            const gifBlob = await createGifFromCanvases(gifCanvases, delays);
-            const gifName = file.name.replace(/\.psd$/i, '_outlined.gif');
+          if (naverOutput === 'ogq-gif') {
+            /* ── OGQ GIF 생성 (740×640 + 프레임 더블링) ── */
+            setStatus('OGQ GIF 생성 중...');
+            const gifCanvases = naverPreviews.map(p => {
+              const scW = p.canvas.width / 740, scH = p.canvas.height / 640;
+              const is740 = Math.abs(scW - scH) < 0.01 && Math.abs(scW - 1) < 0.01;
+              if (is740) return p.canvas;
+              // 740×640으로 리사이즈
+              const maxScale = Math.min(640 / p.canvas.width, 640 / p.canvas.height);
+              const sw = Math.round(p.canvas.width * maxScale), sh = Math.round(p.canvas.height * maxScale);
+              const sq = document.createElement('canvas'); sq.width = 640; sq.height = 640;
+              sq.getContext('2d').drawImage(p.canvas, Math.round((640 - sw) / 2), Math.round((640 - sh) / 2), sw, sh);
+              const fin = document.createElement('canvas'); fin.width = 740; fin.height = 640;
+              fin.getContext('2d').drawImage(sq, 50, 0);
+              return fin;
+            });
+            const delay = getOgqGifDelay();
+            const ogq = rearrangeForOGQ(gifCanvases, delay);
+            const gifBlob = await createGifFromCanvases(ogq.canvases, ogq.delays);
+            const gifName = file.name.replace(/\.psd$/i, '_ogq.gif');
             resultBlobs.push({ name: gifName, blob: gifBlob });
-            setStatus('완성! GIF 생성 완료 (' + naverPreviews.length + '프레임)');
+            setStatus('완성! OGQ GIF 생성 완료 (' + ogq.canvases.length + '프레임)');
             psdFileIndex++;
 
           } else if (naverOutput === 'png740') {
@@ -1047,22 +1385,28 @@ async function run() {
             const psdBaseName = file.name.replace(/\.psd$/i, '');
             for (let pi = 0; pi < naverPreviews.length; pi++) {
               const src = naverPreviews[pi].canvas;
-              // 1) 640×640으로 리사이즈 (비율 유지, 중앙 배치)
-              const sq = document.createElement('canvas');
-              sq.width = 640; sq.height = 640;
-              const sqCtx = sq.getContext('2d');
-              const scale = Math.min(640 / src.width, 640 / src.height);
-              const sw = Math.round(src.width * scale);
-              const sh = Math.round(src.height * scale);
-              const sx = Math.round((640 - sw) / 2);
-              const sy = Math.round((640 - sh) / 2);
-              sqCtx.drawImage(src, sx, sy, sw, sh);
-              // 2) 가로 740으로 확장 (양쪽 여백 50px, 중앙 배치)
-              const cropped = document.createElement('canvas');
-              cropped.width = 740; cropped.height = 640;
-              const cropCtx = cropped.getContext('2d');
-              cropCtx.drawImage(sq, Math.round((740 - 640) / 2), 0);
-              const pngBlob = await canvasToBlob(cropped);
+              const scaleW = src.width / 740, scaleH = src.height / 640;
+              const is740multiple = Math.abs(scaleW - scaleH) < 0.01 && scaleW > 0;
+              let finalCanvas;
+              if (is740multiple) {
+                // 740×640의 배수 (0.5x, 1x, 2x 등) → 단순 리사이즈
+                finalCanvas = resizeCanvas(src, 740, 640);
+              } else {
+                // 정사각형 등 → 640×640 안에 넣고 양쪽 여백 50px
+                const sq = document.createElement('canvas');
+                sq.width = 640; sq.height = 640;
+                const sqCtx = sq.getContext('2d');
+                const scale = Math.min(640 / src.width, 640 / src.height);
+                const sw = Math.round(src.width * scale);
+                const sh = Math.round(src.height * scale);
+                const sx = Math.round((640 - sw) / 2);
+                const sy = Math.round((640 - sh) / 2);
+                sqCtx.drawImage(src, sx, sy, sw, sh);
+                finalCanvas = document.createElement('canvas');
+                finalCanvas.width = 740; finalCanvas.height = 640;
+                finalCanvas.getContext('2d').drawImage(sq, Math.round((740 - 640) / 2), 0);
+              }
+              const pngBlob = await canvasToBlob(finalCanvas);
               const num = String(pi + 1).padStart(2, '0');
               const singleResult740 = (naverPreviews.length === 1);
               let pngName;
@@ -1201,6 +1545,7 @@ function selectTarget(mode) {
   let activeEl;
   if (mode === 'top-of-group') activeEl = document.getElementById('opt-top');
   else if (mode === 'all-layers') activeEl = document.getElementById('opt-all');
+  else if (mode === 'gif-only') activeEl = document.getElementById('opt-gif');
   else activeEl = document.getElementById('opt-png');
   activeEl.classList.add('selected');
   activeEl.querySelector('input[type=radio]').checked = true;
@@ -1210,12 +1555,19 @@ function selectTarget(mode) {
     document.querySelectorAll('.kakao-size-btn').forEach(b => { b.classList.remove('active'); b.querySelector('input').checked = false; });
     document.querySelectorAll('.kakao-out-btn').forEach(b => { b.classList.remove('active'); b.querySelector('input').checked = false; });
     document.querySelectorAll('.naver-out-btn').forEach(b => { b.classList.remove('active'); b.querySelector('input').checked = false; });
-    document.getElementById('gifSettings').style.display = 'none';
+    document.querySelectorAll('.gif-border-btn').forEach(b => { b.classList.remove('active'); b.querySelector('input').checked = false; });
+    document.querySelectorAll('.gif-size-btn').forEach(b => { b.classList.remove('active'); b.querySelector('input').checked = false; });
+    document.getElementById('ogqGifSettings').style.display = 'none';
     // 새 탭의 첫 번째 토글만 활성화
     if (mode === 'top-of-group') {
       const s = document.querySelector('.kakao-size-btn'); if (s) { s.classList.add('active'); s.querySelector('input').checked = true; }
     } else if (mode === 'all-layers') {
       const n = document.querySelector('.naver-out-btn'); if (n) { n.classList.add('active'); n.querySelector('input').checked = true; }
+    } else if (mode === 'gif-only') {
+      // 사이즈: 원본 사이즈 (첫 번째)
+      const gs = document.querySelector('.gif-size-btn'); if (gs) { gs.classList.add('active'); gs.querySelector('input').checked = true; }
+      // 테두리: 텍스트만 테두리 (첫 번째)
+      const gb = document.querySelector('.gif-border-btn'); if (gb) { gb.classList.add('active'); gb.querySelector('input').checked = true; }
     }
   }
 }
@@ -1271,9 +1623,10 @@ function resetAll() {
   // 타겟 초기화 → 카카오 선택
   selectTarget('top-of-group');
   // GIF 설정 초기화
-  document.getElementById('gifSettings').style.display = 'none';
-  document.getElementById('gifPerFrameList').innerHTML = '';
-  document.getElementById('gifPerFrameHint').style.display = 'block';
+  document.getElementById('ogqGifSettings').style.display = 'none';
+  gifOnlyMode = 'uniform';
+  document.getElementById('gifOnlyPerFrameList').innerHTML = '';
+  document.getElementById('gifOnlyPerFrameHint').style.display = 'block';
 }
 </script>
 </body>
