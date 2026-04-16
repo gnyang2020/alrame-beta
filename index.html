@@ -9,19 +9,19 @@
 <script src="https://cdn.jsdelivr.net/npm/gif.js@0.2.0/dist/gif.js"></script>
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
-body { font-family: 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif; background: #07C183; min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding: 40px 16px 60px; color: #333; }
+body { font-family: 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif; background: linear-gradient(165deg, #07C183, #05D68E); min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding: 40px 16px 60px; color: #333; }
 .header-hero { text-align: center; padding: 32px 24px 28px; margin-bottom: 8px; position: relative; }
 .header-hero::before { content: ''; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 320px; height: 120px; background: radial-gradient(ellipse, rgba(255,255,255,0.12) 0%, transparent 70%); pointer-events: none; }
 h1 { font-size: 28px; font-weight: 900; color: #fff; letter-spacing: 2px; line-height: 1.4; text-shadow: 0 2px 12px rgba(0,0,0,0.15); margin-bottom: 4px; position: relative; }
 .title-kr { font-size: 36px; font-weight: 900; letter-spacing: 6px; display: block; margin-top: 2px; background: linear-gradient(180deg, #fff 30%, rgba(255,255,255,0.7) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
 .sub-maker { font-size: 11px; color: rgba(255,255,255,0.5); margin-bottom: 12px; font-weight: 500; letter-spacing: 3px; text-transform: uppercase; }
 .sub { font-size: 13px; color: rgba(255,255,255,0.75); margin-bottom: 28px; line-height: 1.7; text-align: center; max-width: 400px; margin-left: auto; margin-right: auto; }
-.card { background: #FFFFFF; border-radius: 16px; box-shadow: 0 4px 24px rgba(0,0,0,0.1); padding: 28px 24px; width: 100%; max-width: 540px; margin-bottom: 16px; }
-.section-title { font-size: 11px; font-weight: 700; color: #999; letter-spacing: 0.8px; text-transform: uppercase; margin-bottom: 12px; }
-.dropzone { border: 2px dashed #D0D0D0; border-radius: 14px; padding: 32px 20px; text-align: center; cursor: pointer; transition: all 0.2s; background: #F8F8F8; margin-bottom: 10px; }
-.dropzone:hover, .dropzone.drag-over { border-color: #BDBDBD; background: #F0F0F0; }
-.dropzone p { font-size: 14px; color: #888; line-height: 1.6; }
-.dropzone span { color: #333; font-weight: 700; }
+.card { background: #FFFFFF; border-radius: 16px; box-shadow: 0 2px 16px rgba(7,193,131,0.08); padding: 28px 24px; width: 100%; max-width: 540px; margin-bottom: 16px; }
+.section-title { font-size: 11px; font-weight: 700; color: #07C183; letter-spacing: 0.8px; text-transform: uppercase; margin-bottom: 12px; }
+.dropzone { border: 2px dashed #A7F3D0; border-radius: 14px; padding: 32px 20px; text-align: center; cursor: pointer; transition: all 0.2s; background: #F0FDF9; margin-bottom: 10px; }
+.dropzone:hover, .dropzone.drag-over { border-color: #07C183; background: #ECFDF5; }
+.dropzone p { font-size: 14px; color: #6DB89A; line-height: 1.6; }
+.dropzone span { color: #059669; font-weight: 700; }
 #fileInput { display: none; }
 /* 파일 목록 */
 .file-list { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-bottom: 14px; }
@@ -37,7 +37,7 @@ input[type=number]:focus { border-color: #07C183; }
 .unit { font-size: 12px; color: #999; }
 .recommend-sizes { font-size: 11px; color: #999; line-height: 1.8; margin-left: 4px; }
 .preset-pill { padding:5px 14px; border:none; border-radius:99px; background:#EEEEEE; font-size:12px; font-weight:700; color:#777; cursor:pointer; font-family:inherit; transition: all 0.1s cubic-bezier(0.34,1.56,0.64,1); }
-.preset-pill:hover { background:#07C183; color:#fff; }
+.preset-pill:hover { background:#059669; color:#fff; }
 .preset-pill:active { transform: scale(1.08); }
 input[type=color] { width: 40px; height: 34px; border: 2px solid #DDD; border-radius: 10px; padding: 2px; cursor: pointer; background: #F8F8F8; }
 /* 타겟 옵션 */
@@ -91,7 +91,7 @@ input[type=color] { width: 40px; height: 34px; border: 2px solid #DDD; border-ra
 .badge-naver { background: #03C75A; color: #fff; }
 .badge-blue { background: #E3F2FD; color: #1565C0; }
 /* 버튼 */
-.run-btn { width: 100%; padding: 15px; background: linear-gradient(135deg, #07C183, #059B68); color: #fff; border: none; border-radius: 14px; font-size: 15px; font-weight: 800; font-family: inherit; cursor: pointer; transition: opacity 0.2s, transform 0.1s; }
+.run-btn { width: 100%; padding: 15px; background: linear-gradient(135deg, #2563EB, #3B82F6); color: #fff; border: none; border-radius: 14px; font-size: 15px; font-weight: 800; font-family: inherit; cursor: pointer; transition: opacity 0.2s, transform 0.1s; }
 .run-btn:hover { opacity: 0.85; transform: translateY(-1px); }
 .run-btn { transition: transform 0.1s cubic-bezier(0.34,1.56,0.64,1), opacity 0.2s; }
 .run-btn:active { transform: scale(1.06); box-shadow: 0 4px 16px rgba(0,0,0,0.15); }
@@ -105,7 +105,7 @@ input[type=color] { width: 40px; height: 34px; border: 2px solid #DDD; border-ra
 .preview-item { display: flex; flex-direction: column; align-items: center; gap: 3px; }
 .preview-item canvas { border-radius: 6px; border: 1px solid #E0E0E0; background: repeating-conic-gradient(#F0F0F0 0% 25%, #E8E8E8 0% 50%) 0 0 / 10px 10px; }
 .preview-item span { font-size: 10px; color: #888; max-width: 80px; text-align: center; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
-.dl-btn { width: 100%; padding: 14px; background: linear-gradient(135deg, #07C183, #059B68); color: #fff; border: none; border-radius: 14px; font-size: 15px; font-weight: 800; font-family: inherit; cursor: pointer; margin-top: 12px; }
+.dl-btn { width: 100%; padding: 14px; background: linear-gradient(135deg, #2563EB, #3B82F6); color: #fff; border: none; border-radius: 14px; font-size: 15px; font-weight: 800; font-family: inherit; cursor: pointer; margin-top: 12px; }
 .dl-btn:hover { opacity: 0.85; }
 .dl-btn { transition: transform 0.1s cubic-bezier(0.34,1.56,0.64,1); }
 .dl-btn:active { transform: scale(1.06); box-shadow: 0 4px 16px rgba(0,0,0,0.15); }
